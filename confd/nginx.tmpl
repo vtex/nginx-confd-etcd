@@ -1,20 +1,19 @@
+upstream router.vtex.com {
 {{ range gets "/services/<%service%>/*" }}
-    {{ $config := split (.Key) ":" }}
-    {{ $url := split (index $config 1) "." }}
-
-upstream {{ index $config 1 }} {
-  server {{ .Value }};
+  {{ $config := split (.Key) ":" }}
+  {{ $url := split (index $config 1) "." }}
+  server {{ .Value }}
+{{ end }}
 }
 
 server {
     listen 80;
-    server_name {{ index $url 1 }}.<%demo_domain%>;
-    server_name {{ index $url 1 }}.{{ index $url 2 }};
+    server_name vtex.com
 
     access_log /var/log/nginx/access.log upstreamlog;
 
     location / {
-        proxy_pass http://{{ index $config 1 }};
+        proxy_pass http://router.vtex.com
         proxy_redirect off;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -22,4 +21,3 @@ server {
     }
 }
 
-{{ end }}
